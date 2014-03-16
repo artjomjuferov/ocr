@@ -21,21 +21,31 @@ $(document).ready(function(){
   });
 
 //////// <Class Pixel> ////////// 
-  function Pixel (r, g, b, a, i, j) {
-    this.color.r = r;
-    this.color.g = g;
-    this.color.b = b;
-    this.color.a = a;
-    this.pos.i = i;
-    this.pos.j = i;
-    this.status.i = -1;
-    this.status.j = -1;
+  function Pixel (_r, _g, _b, _a, _i, _j) {
+    this.color = {
+      r : _r,
+      g : _g,
+      b : _b,
+      b : _b
+    };
+
+    this.pos = {
+      i : _i,
+      j : _j
+    };
+
+    this.status = {
+      i : -1,
+      j : -1
+    };
     this.arrSib = [];
   };
 
   Pixel.prototype.setStatus = function(comp) {
-    this.status.i = comp.num.i;
-    this.status.j = comp.num.j;
+    this.status = {
+      i : comp.num.i,
+      j : comp.num.j
+    };
   };
 
   Pixel.prototype.haveStatus = function() {
@@ -70,9 +80,11 @@ $(document).ready(function(){
 
 
 //////// <Class СonComp> ////////// 
-  function СonComp (i, j) {
-    this.num.i = i;
-    this.num.j = j;
+  function СonComp (_i, _j) {
+    this.num = {
+      i : _i,
+      j : _j
+    };
     this.arr2d = []
   }
 
@@ -152,9 +164,9 @@ $(document).ready(function(){
         j++;
         arr[j] = [];
       }
-      var pixelColor = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3], i, j);
+      var pixel = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3], i, j);
       
-      arr[j].push(pixelColor);
+      arr[j].push(pixel);
     }
     return arr;
   };
@@ -193,7 +205,6 @@ $(document).ready(function(){
     var imgObj = ctx.getImageData(0, 0, w, h);
     
 
-    // console.log(typeof(data.data));
     arr2d = dataImgToArr2d(w, imgObj.data);
     
     //imgObj.data = arr2dToImgData(arr2d);
