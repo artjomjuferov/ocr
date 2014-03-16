@@ -16,7 +16,6 @@ $(document).ready(function(){
   $("#clearCanvas").click(function(){
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   });
 
@@ -26,7 +25,7 @@ $(document).ready(function(){
       r : _r,
       g : _g,
       b : _b,
-      b : _b
+      a : _a
     };
 
     this.pos = {
@@ -42,6 +41,7 @@ $(document).ready(function(){
   };
 
   Pixel.prototype.setStatus = function(sib) {
+    console.log(sib);
     this.status = {
       i : sib.status.i,
       j : sib.status.j
@@ -57,8 +57,8 @@ $(document).ready(function(){
   };
 
   Pixel.prototype.findNonWhiteSib = function(arr2d) {
-    for(var i=this.pos.i-1; i<this.pos.j+2; i++){
-      for(var j=this.pos.j-1; j<this.pos.j+2; j++){
+    for(var i = this.pos.i-1; i < this.pos.j+2; i++){
+      for(var j = this.pos.j-1; j < this.pos.j+2; j++){
         if (i == j){
           continue;
         }
@@ -70,7 +70,7 @@ $(document).ready(function(){
   };
 
   Pixel.prototype.isWhite = function() {
-    if (this.r > 5 || this.g > 5 || this.b > 5 || this.a > 5){
+    if (this.color.r > 5 || this.color.g > 5 || this.color.b > 5 || this.color.a > 5){
       return false;
     }else {
       return true;
@@ -85,13 +85,19 @@ $(document).ready(function(){
       i : _i,
       j : _j
     };
+    this.bound = {
+      l : 1000000,
+      r : -1,
+      h : -1,
+      d : 1000000
+    };
     this.arr2d = []
   }
 
   СonComp.prototype.getArr2d = function(arr2d) {
-    for(var i=this.bound.l; i<=this.bound.r; i++){
+    for(var i = this.bound.l; i <= this.bound.r; i++){
       this.arr2d[i] = [];
-      for(var j=this.bound.h; j<=this.bound.d; j++){
+      for(var j = this.bound.h; j <= this.bound.d; j++){
         this.arr2d[i-this.bound.l].push = arr2d[i][j];
       }
     }
@@ -111,19 +117,15 @@ $(document).ready(function(){
 //////// </Class ConComp> ///////////
 
 
-
-
-
   var readURL = function(input){
-      if (input.files && input.files[0]){
-          var reader = new FileReader();
-          reader.onload = function (e){
-              window.image = createImage(e.target.result);
-          }
-          reader.readAsDataURL(input.files[0]);
-      }
+    if (input.files && input.files[0]){
+        var reader = new FileReader();
+        reader.onload = function (e){
+            window.image = createImage(e.target.result);
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
   };
-
 
   var createImage = function (src){
     var img = document.createElement('img');
@@ -137,13 +139,11 @@ $(document).ready(function(){
     var arr = [];
     var j = -1;
     for(var i=0; i<imgData.length; i+=4){
-      
       if (i/4 % w == 0){
         j++;
         arr[j] = [];
       }
       var pixel = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3], i, j);
-      
       arr[j].push(pixel);
     }
     return arr;
@@ -161,18 +161,18 @@ $(document).ready(function(){
       }
     }
     console.log(arr);
-
     return arr;
   };
 
 
   var bfs = function(pixel, comp, arr2d){
     var queue = [];
-    pixel.setStatus(comp);
+    pixel.setStatus(pixel);
     queue.push(pixel);
     while (queue.length != 0){
       var u = queue.shift();
       u.findNonWhiteSib(arr2d);
+      comp.checkBound(u);
       for(var i=0; i<u.arrSib.length; i++){
         u.arrSib[i].setStatus(u);
         queue.push(arrSib[i]);
@@ -185,9 +185,9 @@ $(document).ready(function(){
     for(var i=0; i<arr2d.length; i++){
       for(var j=0; j< arr2d[i].length; j++){
         var pixel = arr2d[i][j]
-          console.log(i+ " " + j);
-        if (pixel.isWhie && !pixel.haveStatus){
-          var comp = new ConComp(i, j);
+        if (!pixel.isWhite() && !pixel.haveStatus()){
+          //console.log(i+ " " + j);
+          var comp = new СonComp(i, j);
           bfs(pixel, comp, arr2d);
           arr.push(comp);
         }
@@ -198,7 +198,6 @@ $(document).ready(function(){
 
   var getImgMatrix = function(image){
     var canvas = document.getElementById("myCanvas");
-    
     var ctx = canvas.getContext("2d");
     var h = canvas.height, w = canvas.width;
     if (image){
@@ -208,14 +207,9 @@ $(document).ready(function(){
       canvas.height = h;
       ctx.drawImage(image, 0, 0);
     }
-
     var imgObj = ctx.getImageData(0, 0, w, h);
-    
-
     arr2d = dataImgToArr2d(w, imgObj.data);
-    
     var comps = findAllConComps(arr2d);
-    
     console.log(comps);
     //return data;
   };

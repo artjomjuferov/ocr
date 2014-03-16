@@ -6,8 +6,13 @@
     <title>My-ocr</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-      body {background-color:#6495ed;}
-      canvas {background-color:white;}
+      body {
+        /*background-color:;*/
+      }
+      canvas {
+        background-color:white;
+        border:3px solid red;
+      }
     </style>
   </head>
   <body>
@@ -15,7 +20,7 @@
     <input type='file' id="imgInput" />
     <input type='button' id="clearCanvas" />
     <div id="area">
-      <canvas id="myCanvas" height="100" width="320"></canvas>
+      <canvas id="myCanvas" height="50" width="110"></canvas>
     </div>
     <button id="showMatrix">show </button>
     <script src="jquery-2.1.0.min.js"></script>
