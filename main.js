@@ -41,10 +41,10 @@ $(document).ready(function(){
     this.arrSib = [];
   };
 
-  Pixel.prototype.setStatus = function(comp) {
+  Pixel.prototype.setStatus = function(sib) {
     this.status = {
-      i : comp.num.i,
-      j : comp.num.j
+      i : sib.status.i,
+      j : sib.status.j
     };
   };
 
@@ -110,30 +110,8 @@ $(document).ready(function(){
   };
 //////// </Class ConComp> ///////////
 
-  var bfs = function(pixel, comp, arr2d){
-    var queue = [];
-    pixel.setStatus(comp);
-    queue.push(pixel);
-    while (queue.length != 0){
-      var u = queue.shift();
 
-    }
-  };
 
-  var findAllConComps = function(arr2d){
-    var arr = [];
-    for(var i=0; i<arr2d.length; i++){
-      for(var j=0; j< arr2d[i].length; j++){
-        var pixel = arr2d[i][j]
-        if (pixel.isWhie && !pixel.haveStatus){
-          var comp = new ConComp(i, j);
-          bfs(pixel, comp, arr2d);
-          arr.push(comp);
-        }
-      }
-    }
-    return arr;
-  };
 
 
   var readURL = function(input){
@@ -188,6 +166,35 @@ $(document).ready(function(){
   };
 
 
+  var bfs = function(pixel, comp, arr2d){
+    var queue = [];
+    pixel.setStatus(comp);
+    queue.push(pixel);
+    while (queue.length != 0){
+      var u = queue.shift();
+      u.findNonWhiteSib(arr2d);
+      for(var i=0; i<u.arrSib.length; i++){
+        u.arrSib[i].setStatus(u);
+        queue.push(arrSib[i]);
+      }
+    }
+  };
+
+  var findAllConComps = function(arr2d){
+    var arr = [];
+    for(var i=0; i<arr2d.length; i++){
+      for(var j=0; j< arr2d[i].length; j++){
+        var pixel = arr2d[i][j]
+          console.log(i+ " " + j);
+        if (pixel.isWhie && !pixel.haveStatus){
+          var comp = new ConComp(i, j);
+          bfs(pixel, comp, arr2d);
+          arr.push(comp);
+        }
+      }
+    }
+    return arr;
+  };
 
   var getImgMatrix = function(image){
     var canvas = document.getElementById("myCanvas");
@@ -207,9 +214,9 @@ $(document).ready(function(){
 
     arr2d = dataImgToArr2d(w, imgObj.data);
     
-    //imgObj.data = arr2dToImgData(arr2d);
+    var comps = findAllConComps(arr2d);
     
-    
+    console.log(comps);
     //return data;
   };
 
