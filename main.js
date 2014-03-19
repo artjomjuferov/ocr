@@ -27,7 +27,6 @@ $(document).ready(function(){
       b : _b,
       a : _a
     };
-
     this.pos = {
       i : _i,
       j : _j
@@ -41,35 +40,38 @@ $(document).ready(function(){
   };
 
   Pixel.prototype.setStatus = function(sib) {
-    console.log(sib);
     this.status = {
       i : sib.status.i,
       j : sib.status.j
     };
   };
 
-  Pixel.prototype.haveStatus = function() {
-    if (this.status.i != -1 && this.status.j != -1){
-      return true;
-    }else{
-      return false;
-    }
-  };
 
-  Pixel.prototype.findNonWhiteSib = function(arr2d) {
-    for(var i = this.pos.i-1; i < this.pos.j+2; i++){
+  Pixel.prototype.findRigthSib = function(arr2d) {
+    for(var i = this.pos.i-1; i < this.pos.i+2; i++){
       for(var j = this.pos.j-1; j < this.pos.j+2; j++){
         if (i == j){
           continue;
         }
-        if (!arr[i][j].isWhite() && !arr[i][j].haveStatus()){
+        console.log(i + " " + j);
+        console.log(arr2d[i]);
+        // console.log(arr2d[i][j]._isWhite());
+        // console.log(arr2d[i][j]._haveStatus());
+        if (!arr2d[i][j]._isWhite() && !arr2d[i][j]._haveStatus()){
           this.arrSib.push(arr[i][j]);
         }
       }
     }
   };
 
-  Pixel.prototype.isWhite = function() {
+  Pixel.prototype._haveStatus = function() {
+    if (this.status.i != -1 && this.status.j != -1){
+      return true;
+    }else{
+      return false;
+    }
+  };
+  Pixel.prototype._isWhite = function() {
     if (this.color.r > 5 || this.color.g > 5 || this.color.b > 5 || this.color.a > 5){
       return false;
     }else {
@@ -143,7 +145,7 @@ $(document).ready(function(){
         j++;
         arr[j] = [];
       }
-      var pixel = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3], i, j);
+      var pixel = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3], i/4 % w, j);
       arr[j].push(pixel);
     }
     return arr;
@@ -154,24 +156,28 @@ $(document).ready(function(){
     var k = 0;
     for(var i=0; i<arr2d.length; i++){
       for(var j=0; j< arr2d[i].length; j++){
-        arr.push(arr2d[i][j].r+12);
+        arr.push(arr2d[i][j].r);
         arr.push(arr2d[i][j].g);
         arr.push(arr2d[i][j].b);
-        arr.push(arr2d[i][j].a-11);
+        arr.push(arr2d[i][j].a);
       }
     }
-    console.log(arr);
     return arr;
   };
 
 
   var bfs = function(pixel, comp, arr2d){
     var queue = [];
+    console.log("Comp is ");
+    console.log(comp);
     pixel.setStatus(pixel);
     queue.push(pixel);
     while (queue.length != 0){
       var u = queue.shift();
-      u.findNonWhiteSib(arr2d);
+      console.log("oine");
+      console.log(u);
+      u.setStatus(pixel);
+      u.findRigthSib(arr2d);
       comp.checkBound(u);
       for(var i=0; i<u.arrSib.length; i++){
         u.arrSib[i].setStatus(u);
@@ -185,8 +191,7 @@ $(document).ready(function(){
     for(var i=0; i<arr2d.length; i++){
       for(var j=0; j< arr2d[i].length; j++){
         var pixel = arr2d[i][j]
-        if (!pixel.isWhite() && !pixel.haveStatus()){
-          //console.log(i+ " " + j);
+        if (!pixel._isWhite() && !pixel._haveStatus()){
           var comp = new СonComp(i, j);
           bfs(pixel, comp, arr2d);
           arr.push(comp);
@@ -210,7 +215,7 @@ $(document).ready(function(){
     var imgObj = ctx.getImageData(0, 0, w, h);
     arr2d = dataImgToArr2d(w, imgObj.data);
     var comps = findAllConComps(arr2d);
-    console.log(comps);
+    // console.log(comps);
     //return data;
   };
 
