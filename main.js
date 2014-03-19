@@ -50,15 +50,13 @@ $(document).ready(function(){
   Pixel.prototype.findRigthSib = function(arr2d) {
     for(var i = this.pos.i-1; i < this.pos.i+2; i++){
       for(var j = this.pos.j-1; j < this.pos.j+2; j++){
-        if (i == j){
+        if (this.pos.i === i && this.pos.j === j){
           continue;
         }
-        console.log(i + " " + j);
-        console.log(arr2d[i]);
-        // console.log(arr2d[i][j]._isWhite());
-        // console.log(arr2d[i][j]._haveStatus());
-        if (!arr2d[i][j]._isWhite() && !arr2d[i][j]._haveStatus()){
-          this.arrSib.push(arr[i][j]);
+        if (arr2d[i] != undefined  && arr2d[i][j] != undefined && !arr2d[i][j]._isWhite() && !arr2d[i][j]._haveStatus()){
+          console.log(arr2d[i][j]);
+          arr2d[i][j].setStatus(this);
+          this.arrSib.push(arr2d[i][j]);
         }
       }
     }
@@ -105,14 +103,21 @@ $(document).ready(function(){
     }
   };
 
+  СonComp.prototype.addToArr = function(pixel) {
+    this.arr2d.push(pixel);
+  };
+
   СonComp.prototype.checkBound = function(pixel) {
     if (pixel.i < this.bound.l){
       this.bound.l = pixel.i;
-    }else if (pixel.i > this.bound.r){
+    }
+    if (pixel.i > this.bound.r){
       this.bound.r = pixel.i;
-    }else if (pixel.j < this.bound.h){
+    }
+    if (pixel.j < this.bound.h){
       this.bound.h = pixel.j;
-    }else if (pixel.j > this.bound.d){
+    }
+    if (pixel.j > this.bound.d){
       this.bound.d = pixel.j;
     }
   };
@@ -141,11 +146,11 @@ $(document).ready(function(){
     var arr = [];
     var j = -1;
     for(var i=0; i<imgData.length; i+=4){
-      if (i/4 % w == 0){
+      if (i/4 % w === 0){
         j++;
         arr[j] = [];
       }
-      var pixel = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3], i/4 % w, j);
+      var pixel = new Pixel(imgData[i], imgData[i+1], imgData[i+2], imgData[i+3],j, i/4 % w);
       arr[j].push(pixel);
     }
     return arr;
@@ -168,20 +173,18 @@ $(document).ready(function(){
 
   var bfs = function(pixel, comp, arr2d){
     var queue = [];
-    console.log("Comp is ");
-    console.log(comp);
-    pixel.setStatus(pixel);
     queue.push(pixel);
     while (queue.length != 0){
       var u = queue.shift();
-      console.log("oine");
-      console.log(u);
       u.setStatus(pixel);
       u.findRigthSib(arr2d);
       comp.checkBound(u);
+      console.log("-+x");
+      console.log(u);
+      console.log("-!-");
       for(var i=0; i<u.arrSib.length; i++){
-        u.arrSib[i].setStatus(u);
-        queue.push(arrSib[i]);
+        console.log("!!");
+        queue.push(u.arrSib[i]);
       }
     }
   };
@@ -192,7 +195,9 @@ $(document).ready(function(){
       for(var j=0; j< arr2d[i].length; j++){
         var pixel = arr2d[i][j]
         if (!pixel._isWhite() && !pixel._haveStatus()){
-          var comp = new СonComp(i, j);
+          var comp = new СonComp(pixel.pos.i, pixel.pos.j);
+          pixel.status.i = pixel.pos.i;
+          pixel.status.j = pixel.pos.j;
           bfs(pixel, comp, arr2d);
           arr.push(comp);
         }
@@ -215,7 +220,7 @@ $(document).ready(function(){
     var imgObj = ctx.getImageData(0, 0, w, h);
     arr2d = dataImgToArr2d(w, imgObj.data);
     var comps = findAllConComps(arr2d);
-    // console.log(comps);
+    console.log(comps);
     //return data;
   };
 
