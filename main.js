@@ -54,7 +54,6 @@ $(document).ready(function(){
           continue;
         }
         if (arr2d[i] != undefined  && arr2d[i][j] != undefined && !arr2d[i][j]._isWhite() && !arr2d[i][j]._haveStatus()){
-          console.log(arr2d[i][j]);
           arr2d[i][j].setStatus(this);
           this.arrSib.push(arr2d[i][j]);
         }
@@ -179,11 +178,11 @@ $(document).ready(function(){
       u.setStatus(pixel);
       u.findRigthSib(arr2d);
       comp.checkBound(u);
-      console.log("-+x");
-      console.log(u);
-      console.log("-!-");
+      // console.log("-+x");
+      // console.log(u);
+      // console.log("-!-");
       for(var i=0; i<u.arrSib.length; i++){
-        console.log("!!");
+        // console.log("!!");
         queue.push(u.arrSib[i]);
       }
     }
